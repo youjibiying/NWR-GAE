@@ -154,7 +154,9 @@ def train_real_datasets(dataset_str, epoch_num = 10, lr = 5e-6, encoder = "GCN",
         FNN = FNN.to(device)
         criterion = torch.nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(FNN.parameters())
+
         if gcn_setting:
+            # semi-supervised learning
             inputs = node_embeddings
             inputs = inputs.to(device)
             for epoch in range(50):
@@ -174,7 +176,8 @@ def train_real_datasets(dataset_str, epoch_num = 10, lr = 5e-6, encoder = "GCN",
             acc = evaluate(FNN, inputs, node_labels, test_mask)
             print(acc)
         else:
-            dataset = NodeClassificationDataset(node_embeddings, node_labels)
+            # 当成MLP的feature samples 分类问题
+            dataset = NodeClassificationDataset(node_embeddings, node_labels) # assign each node_embedding with a node label
             split = utils.DataSplit(dataset, shuffle=True)
             train_loader, val_loader, test_loader = split.get_split(batch_size=64, num_workers=0)
             best = float('inf')
